@@ -3,17 +3,21 @@ const searchButton = document.getElementById('search-button');
 const pokemonName = document.querySelector('.pokemon__name');
 const pokemonImage = document.querySelector('.pokemon__image');
 const pokemonDescription = document.querySelector('.pokemon__description');
+let pokemonData;
 
 const fetchPokemon = async (pokemonNameOrId) => {
   try {
-    const APIResponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonNameOrId.toLowerCase()}`);
+    await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonNameOrId.toLowerCase()}`)
+     .then
+     (async (response) => {
+       if (response.status === 200) {
+         const data = await response.json();
+         pokemonData = data;
+       } else {
+         return null;
+       }
+     });
 
-    if (APIResponse.status === 200) {
-      const data = await APIResponse.json();
-      return data;
-    } else {
-      return null;
-    }
   } catch (error) {
     console.error('Erro ao buscar informações do Pokémon:', error);
     return null;
@@ -48,9 +52,12 @@ const fetchPokemonDescription = async (pokemonId) => {
 searchButton.addEventListener('click', async function () {
   const searchTerm = searchInput.value;
 
-  if (searchTerm) {
-    const pokemonData = await fetchPokemon(searchTerm);
+  console.log('passando aqui', searchInput.value)
 
+  if (searchTerm) {
+    await fetchPokemon(searchTerm);
+    console.log('response: ', pokemonData);
+    
     if (pokemonData) {
       displayPokemon(pokemonData);
     } else {
